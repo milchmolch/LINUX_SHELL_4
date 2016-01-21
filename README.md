@@ -11,46 +11,54 @@ heidi.lischer@ieu.uzh.ch
 ## Bash scripting 4 - repetition and extension
 
 
-The goal is to improve/learn to write simple bash scripts in order to automate tasks  
+The goal is to learn to write simple bash scripts in order to automate tasks  
 
 Topic             |  
 ----------------- | --------------------------
-repetition on bash scripting: command structures (loops,if/else) | Heidi
-writing functions | Heidi
-writing clean code (10 min) | Stefan
-parallel jobs (10 min) | Stefan
-quick intro to cluster submission system (10 min) | Heidi
-programming exercises to write simple scripts | Heidi&Stefan
+Repetition on bash scripting: command structures (loops,if/else) | Heidi
+Writing functions | Heidi
+Writing clean code (10 min) | Stefan
+Parallel jobs (10 min) | Stefan
+Quick intro to cluster submission systems (10 min) | Heidi
+Programming exercises | Heidi&Stefan
 
 
 
 ## Writing safe code in bash
 
-Bash shell scripting is handy to automate tasks or to put together a pipeline that launches a series
-of programs.
+Bash shell scripting is handy to automate tasks like file manipulation, program execution or printing text. It is often
+used to set up a pipeline that executes a series of programs. However, bash syntax is often unintuitive
+(e.g. string manipulation), difficult to read/remember and it does not provide libraries. 
 
-If your script is longer than a few hundred lines of code then rather use a scripting language like Python or Perl.
+If your script is longer than a few dozen or hundred lines of code then you should rather use a general-purpose programming language like Python or Perl.
 
+
+Bash scripts are prone to errors. For [safer scripting](http://robertmuth.blogspot.ch/2012/08/better-bash-scripting-in-15-minutes.html) start every bash script with the following lines.
 
 ```
 #!/bin/bash
-
-cutoff=0.05
-
-echo $cutoff
-# Referencing undefined variables (which default to "") 
-echo $Cutoff
-echo $unset_variable
-
-# failing commands are ignored
-cd NON_EXISTING_FOLDER
-echo "last line"
+set -o nounset
+set -o errexit
 ```
 
-### Links
+This takes care of 2 very common errors
+1. Referencing undefined variables (often due to typos)
+2. Ignoring failing commands
 
-http://robertmuth.blogspot.ch/2012/08/better-bash-scripting-in-15-minutes.html
 
+### Debugging
+
+To perform a syntax check/dry run of your bash script, run:
+```
+bash -n script.sh
+```
+
+If something does not work as expected, you can trace a script using the `-x` option, like so: 
+```
+bash -x script.sh
+```
+This will print each command (predeceded by a "+") before it is executed. Also try `-v` option (=`bash --verbose script.sh`).  
+  
 
 ## Parallel jobs
 
@@ -161,8 +169,11 @@ Valid examples: BaseDir, my_project_dir
 
 2. Working with Variables
 ```
+# Put the output of a command into a variable
 a=$(whoami)
 echo $a
+free=$(df -h . | tail -1 | tr -s " " " " | cut -d" " -f4)
+echo $free
 
 a=4
 b=$(( a+3 ))
@@ -175,12 +186,41 @@ echo ${a##foo.}
 
 
 3. Functions
+
+Use a function, if you use a code block more than once. 
+```
+ExtractBashComments() {
+    egrep "^#"
+} 
+```
+defines a function `ExtractBashComments`. It extracts comment lines from a script:  `cat test_safe_script.sh | ExtractBashComments`   
+
+We can also define a function without an argument (the keyword `function` is optional, we put it for better readibility):
+
 ```
 function today {
 	echo "Today's date is: "
 	date +"%A, %B %-d, %Y"
 }
 ```
+which you can run by `today`  
+
+
+Another example with local variables:
+```
+SumLines() {  # Iterating over stdin 
+	local sum=0
+	local line=""
+	while read line; do
+		sum=$((${sum} + ${line}))
+	done
+	echo $sum
+}
+cat $1 | SumLines
+```
+
+We can now execute the script `bash SumLines.sh numbers.txt`
+
 
 4. Write a loop that prints out chromosomes chr5 - chr9
 ```
@@ -274,9 +314,12 @@ http://www.gnu.org/software/coreutils/manual/coreutils.html
 
 
 - **GNU parallel**  
-http://www.gnu.org/software/parallel
-https://www.biostars.org/p/63816/
+  http://www.gnu.org/software/parallel
+  https://www.biostars.org/p/63816/
+
+- **Safe Bash scripting***
+  http://robertmuth.blogspot.ch/2012/08/better-bash-scripting-in-15-minutes.html
 
 - **Tips & Tricks for using the shell on Mac OS**
-http://furbo.org/2014/09/03/the-terminal/
+  http://furbo.org/2014/09/03/the-terminal/
 
