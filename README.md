@@ -13,15 +13,17 @@ heidi.lischer@ieu.uzh.ch
 
 The goal is to learn to write simple bash scripts in order to automate tasks  
 
-Topic             |  
+Topic             | Person 
 ----------------- | --------------------------
 Repetition on bash scripting: command structures (loops,if/else) | Heidi
 Writing functions | Heidi
-Writing clean code (10 min) | Stefan
+Writing safe code (10 min) | Stefan
 Parallel jobs (10 min) | Stefan
 Quick intro to cluster submission systems (10 min) | Heidi
 Programming exercises | Heidi&Stefan
-
+  
+  
+Heidi's parts: [Theory](URPP_Tutorial_BashScripting_2_HL.pdf) | [Exercises](Exercises_BashScripting_2_HL.pdf)
 
 
 ## Writing safe code in bash
@@ -33,7 +35,7 @@ used to set up a pipeline that executes a series of programs. However, bash synt
 If your script is longer than a few dozen or hundred lines of code then you should rather use a general-purpose programming language like Python or Perl.
 
 
-Bash scripts are prone to errors. For [safer scripting](http://robertmuth.blogspot.ch/2012/08/better-bash-scripting-in-15-minutes.html) start every bash script with the following lines.
+Bash scripts are more prone to errors. For [safer scripting](http://robertmuth.blogspot.ch/2012/08/better-bash-scripting-in-15-minutes.html) start every bash script with the following lines:
 
 ```
 #!/bin/bash
@@ -41,11 +43,11 @@ set -o nounset
 set -o errexit
 ```
 
-This takes care of 2 very common errors
-1. Referencing undefined variables (often due to typos)
-2. Ignoring failing commands
-
-
+This takes care of 2 very common errors  
+1. Referencing undefined variables (often due to typos)  
+2. Ignoring failing commands  
+  
+  
 ### Debugging
 
 To perform a syntax check/dry run of your bash script, run:
@@ -57,7 +59,7 @@ If something does not work as expected, you can trace a script using the `-x` op
 ```
 bash -x script.sh
 ```
-This will print each command (predeceded by a "+") before it is executed. Also try `-v` option (=`bash --verbose script.sh`).  
+This will print each command (predeceded by a "+") before it is executed. Also try the `-v` option (=`bash --verbose script.sh`).  
   
 
 ## Parallel jobs
@@ -65,18 +67,19 @@ This will print each command (predeceded by a "+") before it is executed. Also t
 [GNU Parallel](https://www.gnu.org/software/parallel/) makes analysis faster by parallelizing jobs.
 
 - can handle any number of jobs
+- by default uses all CPUs on your machine (limit using the `-j` option)
 - even on remote computers
 
 
 ### Installation
 
-Ubuntu
+On Ubuntu:
 
 ```
 sudo apt-get install parallel
 ```
 
-Mac using Homebrew
+On Mac using Homebrew:
 
 ```
 brew install parallel
@@ -99,26 +102,27 @@ We can actually drop the ticks:
 ls *.bam | parallel samtools index {}
 ```
 
-There is an alternative way to run something on all BAM files:
+There is an alternative way to run something on all BAM files in the current directory:
 ```
 parallel samtools index ::: *.bam
 ```
 
-Running Freebayes in parallel - 12 chromosomes, each in a separate job
+Running Freebayes in parallel - 12 chromosomes, each in a separate job:
 ```
 command="freebayes --ploidy 2 -f GENOME.fa BAMfile.bam"
 seq 1 12 | awk '{print "chr"$1}' | parallel --keep-order -j 10 "$command -r {}" 
 ```
 
-Running your own script in parallel (`--load 90` max load 90% on the computer)
+Running your own script in parallel (`--load 90` max load 90% on the computer):
 ```
-nohup ls SINGLE_END/*.fastq.gz | parallel -j20 --load 90 ./Run_kallisto_SingleEnd.sh 2>log.kallisto & 
+ls SINGLE_END/*.fastq.gz | parallel -j20 --load 90 ./Run_kallisto_SingleEnd.sh 2>log.kallisto
 ```
 
 ```
+more Run_kallisto_SingleEnd.sh
 #!/bin/sh
 # Runs kallisto on all Fastq Files in Single_End with arg $1
-# for use with GNU parallel 
+# for use with GNU parallel
   
 KALLISTO=~/APPL/KALLISTO/kallisto_linux-v0.42.1/kallisto
 INDEX_FILE=KALLISTO_OUT/Athaliana_longestTranscript.idx
@@ -134,21 +138,50 @@ filename=$(basename $filename)
 $KALLISTO quant -i $INDEX_FILE --single -l 180 $FASTQ -o TEMP_${filename}
 ```
 
+This will the script `Run_kallisto_Single` using 20 CPUs on all FASTQ files of the SINGLE_END subdirectory. Error messages will be
+written to the file `log.kallisto`.
 
-## Customizing
+## (optional) Customizing the shell
 
-.bashrc
-.bash_profile
+### Define aliases
+
+We can define an alias, i.e. a sort of shortcut which is easier to remember and/or saves some typing.
+
 ```
 alias grepcol="grep --color"
 ```
 
-Try `grepcol` 
+defines a new command `grepcol` that color-marks the matching text.  
+  
+The following aliases define aliases to create or extract tar archives.
 
 ```
 alias tarup="tar -zcf"
 alias tardown="tar -zxf"
 ```
+
+An alias is only active in the current window. To make it permanent we have to add it to the hidden configuration files
+`.bashrc` and `.bash_profile` located in your home directory.  
+  
+The two files have different roles. The `~/.bashrc` file is a script executed whenever a new terminal session is started in **interactive
+mode** (if open a new terminal window or tab). In contrast, if you log in to session (asking for a password) the script `~/.bash_profile`
+is executed (e.g. if you login via ssh).    
+  
+Ubuntu comes with well commented `.bashrc` and `.profile` files that already define some useful aliases. We modify `~/.bashrc` for:  
+- Creating useful aliases (for example alias ll='ls -l').
+- Setting new environment variables.
+
+For adding more directories to PATH we add to `.profile` the following line:   
+```
+export PATH="/path/to/dir:$PATH"
+```
+
+~/.bashrc is actually only executed by the bash shell, other shells work differently.
+
+On Mac OS the configuration also look different, they are called `~./bash_profile` and `~/.profile` 
+  
+Check both files in your home directory.
+
 
 ## Exercises
 
@@ -184,7 +217,6 @@ echo ${a%%.bar}
 echo ${a##foo.}
 ```
 
-
 3. Functions
 
 Use a function, if you use a code block more than once. 
@@ -219,66 +251,16 @@ SumLines() {  # Iterating over stdin
 cat $1 | SumLines
 ```
 
-We can now execute the script `bash SumLines.sh numbers.txt`
+We can now execute the script by doing `bash SumLines.sh numbers.txt`
 
 
-4. Write a loop that prints out chromosomes chr5 - chr9
-```
-for i in 5 6 7 8 9
-do
-	echo "chr"$i 
-done
-```
-
-or alternatively (see also <nested commands> above):
-```
-for i in `seq 5 9`
-do
-        echo "chr"$i
-done
-``
-
-5. Write a script that reads from a file
-
-
-6. Modify the following script to make it safe 
-```
-#!/bin/bash
-
-cutoff=0.05
-
-echo $cutoff
-# Referencing undefined variables (which default to "") 
-echo $Cutoff
-echo $unset_variable
-
-# failing commands are ignored
-cd NON_EXISTING_FOLDER
-echo "last line"
-```
-
-7. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
-
-```
-#!/bin/bash
-
-echo -n "Enter a number between 1-3 > "
-read choice
-case $choice in
-        1) echo "You selected 1."
-           # some commands
-           ;;
-        2) echo "You selected 2."
-           # some commands
-           ;;   
-        3) echo "You selected 3."
-           # some commands
-           ;;   
-        *) echo "You did not enter a number between 1-3"
-           ;;
-esac
-```
-
+4. Write a script that prints out chromosomes chr5 - chr9  
+  
+  
+5. Modify the following script to make it safe  
+  
+  
+6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
 
 
 ## Advanced topics
@@ -300,18 +282,68 @@ for i in `ls | grep foo | tr a-z A-Z` do
 done
 ```
 
+## Solutions
+
+4. Write a script that prints out chromosomes chr5 - chr9
+```
+for i in 5 6 7 8 9
+do
+        echo "chr"$i 
+done
+```
+
+or alternatively (see also <nested commands> above):
+```
+for i in `seq 5 9`
+do
+        echo "chr"$i
+done
+``
+
+5. Modify the following script to make it safe 
+```
+#!/bin/bash
+
+cutoff=0.05
+
+echo $cutoff
+# Referencing undefined variables (which default to "") 
+echo $Cutoff
+echo $unset_variable
+
+# failing commands are ignored
+cd NON_EXISTING_FOLDER
+echo "last line"
+```
+
+6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
+
+```
+#!/bin/bash
+
+echo -n "Enter a number between 1-3 > "
+read choice
+case $choice in
+        1) echo "You selected 1."
+           # some commands
+           ;;
+        2) echo "You selected 2."
+           # some commands
+           ;;   
+        3) echo "You selected 3."
+           # some commands
+           ;;   
+        *) echo "You did not enter a number between 1-3"
+           ;;
+esac
+```
+
 ## Sources / Links
 
-https://portal.tacc.utexas.edu/documents/13601/1080823/Shell+scripting+2014+eijkhout+%281%29.pdf/52353fc6-0fff-4efb-bfda-4a511827332e
+- Explain shell commands http://explainshell.com/
 
-https://portal.tacc.utexas.edu/documents/13601/1080823/LinuxIntro-20141009-eijkhout+%281%29.pdf/bcdcefad-47c5-4741-ab9f-c3380e63df93
-
-http://explainshell.com/
-
-https://github.com/swcarpentry/good-enough-practices-in-scientific-computing/blob/gh-pages/index.md
-
-http://www.gnu.org/software/coreutils/manual/coreutils.html
-
+- List of commands
+  http://www.gnu.org/software/coreutils/manual/coreutils.html
 
 - **GNU parallel**  
   http://www.gnu.org/software/parallel
@@ -323,3 +355,5 @@ http://www.gnu.org/software/coreutils/manual/coreutils.html
 - **Tips & Tricks for using the shell on Mac OS**
   http://furbo.org/2014/09/03/the-terminal/
 
+- Some examples are from
+  https://portal.tacc.utexas.edu/documents/13601/1080823/
