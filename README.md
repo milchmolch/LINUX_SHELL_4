@@ -123,17 +123,17 @@ more Run_kallisto_SingleEnd.sh
 #!/bin/sh
 # Runs kallisto on all Fastq Files in Single_End with arg $1
 # for use with GNU parallel
-  
+\    
 KALLISTO=~/APPL/KALLISTO/kallisto_linux-v0.42.1/kallisto
 INDEX_FILE=KALLISTO_OUT/Athaliana_longestTranscript.idx
 OUT_DIR=KALLISTO_OUT
-  
+\    
 FASTQ=$1
-  
+\       
 # Get sample name
 filename=${FASTQ%%.fastq.gz}
 filename=$(basename $filename)
-  
+\   
 # run kallisto quantification
 $KALLISTO quant -i $INDEX_FILE --single -l 180 $FASTQ -o TEMP_${filename}
 ```
@@ -298,7 +298,7 @@ for i in `seq 5 9`
 do
         echo "chr"$i
 done
-``
+```
 
 5. Modify the following script to make it safe 
 ```
