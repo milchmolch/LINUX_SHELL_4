@@ -188,8 +188,9 @@ Check both files in your home directory.
 ### Repetition - Iron Ration
 
 1. Explore the various ways to go wrong when you declare and use variables
-```
-a = "URPP Evolution"
+
+  ```
+  a = "URPP Evolution"
 a= "URPP Evolution"
 a="URPP Evolution"
 echo a
@@ -227,8 +228,8 @@ echo ${filename%%.*}    # longest match from back - prints sample name
 
 3. Functions
 
-Use a function, if you use a code block more than once. 
-```
+  Use a function, if you use a code block more than once. 
+  ```
 ExtractBashComments() {
     egrep "^#"
 } 
@@ -262,13 +263,13 @@ cat $1 | SumLines
 We can now execute the script by doing `bash SumLines.sh numbers.txt`
 
 
-\4. Write a script that prints out chromosomes chr5 - chr9  
+4. Write a script that prints out chromosomes chr5 - chr9  
   
   
-\5. Modify the following script to make it safe  
+5. Modify the following script to make it safe  
   
   
-\6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
+6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
 
 
 
@@ -295,9 +296,10 @@ done
 
 ## Solutions
 
-\4. Write a script that prints out chromosomes chr5 - chr9
-```
-for i in 5 6 7 8 9
+4. Write a script that prints out chromosomes chr5 - chr9
+
+  ```
+  for i in 5 6 7 8 9
 do
         echo "chr"$i 
 done
@@ -311,9 +313,10 @@ do
 done
 ```
 
-\5. Modify the following script to make it safe 
-```
-#!/bin/bash
+5. Modify the following script to make it safe 
+
+  ```
+  #!/bin/bash
 
 cutoff=0.05
 
@@ -327,10 +330,10 @@ cd NON_EXISTING_FOLDER
 echo "last line"
 ```
 
-\6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
+6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
 
-```
-#!/bin/bash
+  ```
+  #!/bin/bash
 
 echo -n "Enter a number between 1-3 > "
 read choice
