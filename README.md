@@ -151,7 +151,6 @@ We can define an alias, i.e. a sort of shortcut which is easier to remember and/
 ```
 alias grepcol="grep --color"
 ```
-
 defines a new command `grepcol` that color-marks the matching text. Try e.g. `ls | grepcol "\.sh"` 
   
 The following aliases define aliases to create or extract tar archives.
@@ -201,9 +200,10 @@ Variables must start with a letter, most not contain spaces or punctuation marks
 Valid examples: BaseDir, my_project_dir  
 
 
-\2. Working with Variables
-```
-# Put the output of a command into a variable
+2. Working with Variables
+
+  ```
+  # Put the output of a command into a variable
 a=$(whoami)
 echo $a
 free=$(df -h . | tail -1 | tr -s " " " " | cut -d" " -f4)
@@ -225,7 +225,7 @@ echo ${filename##*.}    # longest match from front - prints file extension even 
 echo ${filename%%.*}    # longest match from back - prints sample name
 ```
 
-\3. Functions
+3. Functions
 
 Use a function, if you use a code block more than once. 
 ```
