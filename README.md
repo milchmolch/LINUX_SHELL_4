@@ -152,7 +152,7 @@ We can define an alias, i.e. a sort of shortcut which is easier to remember and/
 alias grepcol="grep --color"
 ```
 
-defines a new command `grepcol` that color-marks the matching text.  
+defines a new command `grepcol` that color-marks the matching text. Try e.g. `ls | grepcol "\.sh"` 
   
 The following aliases define aliases to create or extract tar archives.
 
@@ -279,14 +279,16 @@ We can now execute the script by doing `bash SumLines.sh numbers.txt`
 Use backticks ` to execute a command inside another
 
 ```
-for i in `ls`; do
+for i in `ls`
+do
         echo $i
 done
 ```
 
 One can also pipe multiple commands together
 ```
-for i in `ls | grep foo | tr a-z A-Z` do
+for i in `ls | grep foo | tr a-z A-Z`
+do
         echo $i
 done
 ```
