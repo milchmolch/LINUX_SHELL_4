@@ -60,7 +60,24 @@ If something does not work as expected, you can trace a script using the `-x` op
 bash -x script.sh
 ```
 This will print each command (predeceded by a "+") before it is executed. Also try the `-v` option (=`bash --verbose script.sh`).  
-  
+
+### Exercise
+
+  Modify the following script to make it safer 
+  ```
+  #!/bin/bash
+
+cutoff=0.05
+
+echo $cutoff
+# Referencing undefined variables (which default to "") 
+echo $Cutoff
+echo $unset_variable
+
+# failing commands are ignored
+cd NON_EXISTING_FOLDER
+echo "last line"
+```
 
 ## Parallel jobs
 
@@ -140,6 +157,10 @@ $KALLISTO quant -i $INDEX_FILE --single -l 180 $FASTQ -o TEMP_${filename}
 
 This will the script `Run_kallisto_Single` using 20 CPUs on all FASTQ files of the SINGLE_END subdirectory. Error messages will be
 written to the file `log.kallisto`.
+
+### Exercise
+
+Write a parallelized script that prints out the number of sequences for each FASTQ.gz file in Heidi's files (`BashScripting2/Data`).
 
 
 ## (optional) Customizing the shell
@@ -266,30 +287,10 @@ cat $1 | SumLines
 4. **Write a script that prints out chromosomes chr5 - chr9**  
   
   
-5. **Modify the following script to make it safe**  
-
-  ```
-  #!/bin/bash
-
-cutoff=0.05
-
-echo $cutoff
-# Referencing undefined variables (which default to "") 
-echo $Cutoff
-echo $unset_variable
-
-# failing commands are ignored
-cd NON_EXISTING_FOLDER
-echo "last line"
-```
-
-6. **Multiple conditions**
+5. **Multiple conditions**
 
   Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
 
-
-
-## Advanced topics
 
 ### Nested commands
 
@@ -312,25 +313,9 @@ done
 
 ## Solutions
 
-4. Write a script that prints out chromosomes chr5 - chr9
+### Exercise: Safe coding
 
-  ```
-  for i in 5 6 7 8 9
-do
-        echo "chr"$i 
-done
-```
-
-  or alternatively (see also <nested commands> above):
-  ```
-for i in `seq 5 9`
-do
-        echo "chr"$i
-done
-```
-
-5. Modify the following script to make it safe 
-
+  Modify the following script to make it safe
   ```
   #!/bin/bash
 
@@ -349,7 +334,42 @@ cd NON_EXISTING_FOLDER
 echo "last line"
 ```
 
-6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
+### Exercise: parallel
+
+  ```
+  ls *.fastq.gz | parallel bash ./Count_seq_FASTQ_parallel.sh
+  ```
+
+  ```
+  more Count_seq_FASTQ_parallel.sh 
+  #!/bin/bash
+
+FASTQ=$1
+
+NrSeq=$(gzcat $FASTQ | wc -l) 
+NrSeq=$(( $NrSeq / 4))
+
+echo $FASTQ $NrSeq
+```
+
+\4. Write a script that prints out chromosomes chr5 - chr9
+
+  ```
+  for i in 5 6 7 8 9
+do
+        echo "chr"$i 
+done
+```
+
+  or alternatively (see also <nested commands> above):
+  ```
+for i in `seq 5 9`
+do
+        echo "chr"$i
+done
+```
+
+\6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
 
   ```
   #!/bin/bash
@@ -375,14 +395,14 @@ esac
 
 - Explain shell commands http://explainshell.com/
 
-- List of commands  
+- Linux commands listed  
   http://www.gnu.org/software/coreutils/manual/coreutils.html
 
 - **GNU parallel**  
   http://www.gnu.org/software/parallel
   https://www.biostars.org/p/63816/
 
-- **Safe Bash scripting***  
+- **Safe Bash scripting**    
   http://robertmuth.blogspot.ch/2012/08/better-bash-scripting-in-15-minutes.html
 
 - **Tips & Tricks for using the shell on Mac OS**  
