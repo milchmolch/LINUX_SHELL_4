@@ -305,8 +305,8 @@ do
 done
 ```
 
-or alternatively (see also <nested commands> above):
-```
+  or alternatively (see also <nested commands> above):
+  ```
 for i in `seq 5 9`
 do
         echo "chr"$i
