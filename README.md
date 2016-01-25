@@ -197,8 +197,8 @@ echo a
 echo $a
 ```
 
-Variables must start with a letter, most not contain spaces or punctuation marks  
-Valid examples: BaseDir, my_project_dir  
+  Variables must start with a letter, most not contain spaces or punctuation marks  
+  Valid examples: BaseDir, my_project_dir  
 
 
 2. Working with Variables
@@ -234,22 +234,22 @@ ExtractBashComments() {
     egrep "^#"
 } 
 ```
-defines a function `ExtractBashComments`. It extracts comment lines from a script:  `cat test_safe_script.sh | ExtractBashComments`   
+  defines a function `ExtractBashComments`. It extracts comment lines from a script:  `cat test_safe_script.sh | ExtractBashComments`   
 
-We can also define a function without an argument (the keyword `function` is optional, we put it for better readibility):
+  We can also define a function without an argument (the keyword `function` is optional, we put it for better readibility):
 
-```
-function today {
+  ```
+  function today {
 	echo "Today's date is: "
 	date +"%A, %B %-d, %Y"
 }
 ```
-which you can run by `today`  
+  which you can run by `today`  
 
 
-Another example with local variables:
-```
-SumLines() {  # Iterating over stdin 
+  Another example with local variables:
+  ```
+  SumLines() {  # Iterating over stdin 
 	local sum=0
 	local line=""
 	while read line; do
@@ -260,7 +260,7 @@ SumLines() {  # Iterating over stdin
 cat $1 | SumLines
 ```
 
-We can now execute the script by doing `bash SumLines.sh numbers.txt`
+  We can now execute the script by doing `bash SumLines.sh numbers.txt`
 
 
 4. Write a script that prints out chromosomes chr5 - chr9  
