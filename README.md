@@ -20,7 +20,7 @@ Writing functions | Heidi
 Writing safe code (10 min) | Stefan
 Parallel jobs (10 min) | Stefan
 Quick intro to cluster submission systems (10 min) | Heidi
-Programming exercises | Heidi&Stefan
+Exercises | Heidi&Stefan
   
   
 Heidi's parts: [Theory](URPP_Tutorial_BashScripting_2_HL.pdf) | [Exercises](Exercises_BashScripting_2_HL.pdf)
@@ -35,7 +35,7 @@ used to set up a pipeline that executes a series of programs. However, bash synt
 If your script is longer than a few dozen or hundred lines of code then you should rather use a general-purpose programming language like Python or Perl.
 
 
-Bash scripts are more prone to errors. For [safer scripting](http://robertmuth.blogspot.ch/2012/08/better-bash-scripting-in-15-minutes.html) start every bash script with the following lines:
+Bash scripts are quite prone to errors. For [safer scripting](http://robertmuth.blogspot.ch/2012/08/better-bash-scripting-in-15-minutes.html) start every bash script with the following lines:
 
 ```
 #!/bin/bash
@@ -43,7 +43,7 @@ set -o nounset
 set -o errexit
 ```
 
-This takes care of 2 very common errors  
+This takes care of 2 very common errors:    
 1. Referencing undefined variables (often due to typos)  
 2. Ignoring failing commands  
   
@@ -64,7 +64,7 @@ This will print each command (predeceded by a "+") before it is executed. Also t
 
 ## Parallel jobs
 
-[GNU Parallel](https://www.gnu.org/software/parallel/) makes analysis faster by parallelizing jobs.
+[GNU Parallel](https://www.gnu.org/software/parallel/) makes analysis faster by parallelizing jobs, i.e. by running multiple jobs simultaneously.
 
 - can handle any number of jobs
 - by default uses all CPUs on your machine (limit using the `-j` option)
@@ -92,14 +92,14 @@ Run 10 FASTQC jobs in parallel
 ls *.fq | parallel  -j 12 "fastqc {} --outdir ."
 ```
 
-Index your BAM files in parallel. Prints only the commands, doesn't run them (--dry-run)
+Index your BAM files in parallel. Here we only prints the commands, we don't run them (--dry-run)
 ```
 ls *.bam | parallel --dry-run 'samtools index {}'
 ```
 
 We can actually drop the ticks:
 ```
-ls *.bam | parallel samtools index {}
+ls *.bam | parallel --dry-run samtools index {}
 ```
 
 There is an alternative way to run something on all BAM files in the current directory:
@@ -107,7 +107,7 @@ There is an alternative way to run something on all BAM files in the current dir
 parallel samtools index ::: *.bam
 ```
 
-Running Freebayes in parallel - 12 chromosomes, each in a separate job:
+Running Freebayes in parallel - 12 chromosomes, each in a separate job (`--keep-order` keeps the output in input order):
 ```
 command="freebayes --ploidy 2 -f GENOME.fa BAMfile.bam"
 seq 1 12 | awk '{print "chr"$1}' | parallel --keep-order -j 10 "$command -r {}" 
@@ -120,26 +120,27 @@ ls SINGLE_END/*.fastq.gz | parallel -j20 --load 90 ./Run_kallisto_SingleEnd.sh 2
 
 ```
 more Run_kallisto_SingleEnd.sh
-#!/bin/sh
+#!/bin/bash
 # Runs kallisto on all Fastq Files in Single_End with arg $1
 # for use with GNU parallel
-\    
+    
 KALLISTO=~/APPL/KALLISTO/kallisto_linux-v0.42.1/kallisto
 INDEX_FILE=KALLISTO_OUT/Athaliana_longestTranscript.idx
 OUT_DIR=KALLISTO_OUT
-\    
+    
 FASTQ=$1
-\       
+ 
 # Get sample name
 filename=${FASTQ%%.fastq.gz}
 filename=$(basename $filename)
-\   
+
 # run kallisto quantification
 $KALLISTO quant -i $INDEX_FILE --single -l 180 $FASTQ -o TEMP_${filename}
 ```
 
 This will the script `Run_kallisto_Single` using 20 CPUs on all FASTQ files of the SINGLE_END subdirectory. Error messages will be
 written to the file `log.kallisto`.
+
 
 ## (optional) Customizing the shell
 
@@ -185,7 +186,7 @@ Check both files in your home directory.
 
 ## Exercises
 
-### Repetition
+### Repetition - Iron Ration
 
 1. Explore the various ways to go wrong when you declare and use variables
 ```
@@ -200,7 +201,7 @@ Variables must start with a letter, most not contain spaces or punctuation marks
 Valid examples: BaseDir, my_project_dir  
 
 
-2. Working with Variables
+\2. Working with Variables
 ```
 # Put the output of a command into a variable
 a=$(whoami)
@@ -212,12 +213,19 @@ a=4
 b=$(( a+3 ))
 echo $b
 
-a="foo.bar"
-echo ${a%%.bar}
-echo ${a##foo.}
+a="test.bam"
+echo ${a%.bam}   # shortest match from back - removes file extension
+echo ${a%.*}     # removes any file extension
+echo ${a#*.}     # shortest match from front
+echo ${a:1:2}    # get substring
+echo ${a/test/test2}	 # replace: ${string/pattern/replacement}
+
+filename="Sample3.BWA.bam"
+echo ${filename##*.}    # longest match from front - prints file extension even with multiple "."
+echo ${filename%%.*}    # longest match from back - prints sample name
 ```
 
-3. Functions
+\3. Functions
 
 Use a function, if you use a code block more than once. 
 ```
@@ -244,7 +252,7 @@ SumLines() {  # Iterating over stdin
 	local sum=0
 	local line=""
 	while read line; do
-		sum=$((${sum} + ${line}))
+		sum=$(($sum + $line))
 	done
 	echo $sum
 }
@@ -254,13 +262,14 @@ cat $1 | SumLines
 We can now execute the script by doing `bash SumLines.sh numbers.txt`
 
 
-4. Write a script that prints out chromosomes chr5 - chr9  
+\4. Write a script that prints out chromosomes chr5 - chr9  
   
   
-5. Modify the following script to make it safe  
+\5. Modify the following script to make it safe  
   
   
-6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
+\6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
+
 
 
 ## Advanced topics
@@ -284,7 +293,7 @@ done
 
 ## Solutions
 
-4. Write a script that prints out chromosomes chr5 - chr9
+\4. Write a script that prints out chromosomes chr5 - chr9
 ```
 for i in 5 6 7 8 9
 do
@@ -300,7 +309,7 @@ do
 done
 ```
 
-5. Modify the following script to make it safe 
+\5. Modify the following script to make it safe 
 ```
 #!/bin/bash
 
@@ -316,7 +325,7 @@ cd NON_EXISTING_FOLDER
 echo "last line"
 ```
 
-6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
+\6. Write a bash script that asks the user to enter a number 1-3 and prints out a text (Tip: use the `case` command) 
 
 ```
 #!/bin/bash
@@ -342,18 +351,18 @@ esac
 
 - Explain shell commands http://explainshell.com/
 
-- List of commands
+- List of commands  
   http://www.gnu.org/software/coreutils/manual/coreutils.html
 
 - **GNU parallel**  
   http://www.gnu.org/software/parallel
   https://www.biostars.org/p/63816/
 
-- **Safe Bash scripting***
+- **Safe Bash scripting***  
   http://robertmuth.blogspot.ch/2012/08/better-bash-scripting-in-15-minutes.html
 
-- **Tips & Tricks for using the shell on Mac OS**
+- **Tips & Tricks for using the shell on Mac OS**  
   http://furbo.org/2014/09/03/the-terminal/
 
-- Some examples are from
+- Some examples are from  
   https://portal.tacc.utexas.edu/documents/13601/1080823/
